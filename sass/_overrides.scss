@@ -1,0 +1,159 @@
+// '#0099FF', 'red', 'orange'
+#keyboard {
+  #keyboard-nav {
+    background-color: #242424;
+  }
+
+  #keyboard-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #keyboard-layer {
+    position: relative;
+    left: 0;
+  }
+
+  #reject {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  #cursor {
+    $cursorColor: orange;
+
+    height: 100%;
+    position: absolute;
+    background-color: $cursorColor;
+    border-radius: 3px;
+
+    &::before, &::after {
+      display: block;
+      position: absolute;
+      height: 70%;
+      line-height: 70%;
+      top: 15%;
+      width: 4px;
+      background-color: darken($cursorColor, 6%);
+    }
+
+    &::before {
+      content: "";
+      left: 5px;
+    }
+
+    &::after {
+      content: "";
+      right: 5px;
+    }
+
+  }
+
+  .key {
+    box-model: border-box;
+    position: absolute;
+
+    &.w {
+      outline: 1px solid black;
+      background-color: white;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    &.b {
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+      border-bottom: 1px solid black;
+      background-color: black;
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
+
+    &.selected {
+      background-color: darken(red, 10%);
+    }
+
+    &.disabled {
+      background-color: grey;
+    }
+  }
+}
+
+#experience {
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;
+
+  .background {
+    background-color: white;
+    transition: opacity 20ms;
+    opacity: 0;
+  }
+
+  // wait, thx
+  .message {
+    width: 100%;
+    position: absolute;
+    top: 30%;
+    text-align: center;
+    font-weight: bold;
+
+    // &.wait {
+    //   padding-left: 50px;
+    //   text-align: center;
+    //   box-sizing: border-box;
+    // }
+  }
+
+  #note {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    opacity: 0.9;
+  }
+
+  #intensity {
+    position: relative;
+    height: 100%;
+    width: 100px;
+    opacity: 0.9;
+
+    .forte, .piano {
+      font-family:  Times;
+      font-style: italic;
+      width: 100%;
+      text-align: center;
+      position: absolute;
+    }
+
+    .forte { top: 20px; }
+    .piano { bottom: 20px; }
+
+    svg {
+      width: 50%;
+      height: 70%;
+      position: absolute;
+      top: 15%;
+      left: 25%;
+    }
+
+    line {
+      stroke: white;
+      stroke-width: 2px;
+    }
+  }
+
+  .wait #note, .wait #intensity {
+    opacity: 0.4;
+  }
+
+}
+
+
+
+
+
