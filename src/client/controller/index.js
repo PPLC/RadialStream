@@ -1,25 +1,29 @@
+// import client side soundworks and player experience
 import * as soundworks from 'soundworks/client';
-import viewTemplates from '../shared/viewTemplates';
-import viewContent from '../shared/viewContent';
+import ControllerExperience from './ControllerExperience';
+import serviceViews from '../shared/serviceViews';
 
-class Controller extends soundworks.BasicSharedController {
-  constructor(options) {
-    super(options);
-    this.auth = this.require('auth');
-  }
-}
 
-window.addEventListener('load', () => {
-  const { appName, clientType, socketIO }  = window.soundworksConfig;
+function init() {
+  document.body.classList.remove('loading');
 
-  soundworks.client.init(clientType, { socketIO, appName });
-  soundworks.client.setViewContentDefinitions(viewContent);
-  soundworks.client.setViewTemplateDefinitions(viewTemplates);
+  const config = Object.assign({ appContainer: '#container' }, window.soundworksConfig);
+  soundworks.client.init(config.clientType, config);
 
-  const controller = new Controller({
-    numPlayers: { readOnly: true },
-    state: { type: 'buttons' },
+  soundworks.client.setServiceInstanciationHook((id, instance) => {
+    if (serviceViews.has(id))
+      instance.view = serviceViews.get(id, config);
   });
 
+  const controller = new ControllerExperience({ auth: false });
   soundworks.client.start();
-});
+
+  // reload client if server is down...
+  soundworks.client.socket.addStateListener(eventName => {
+    if (eventName === 'disconnect') {
+      setTimeout(() => window.location.reload(true), 2000);
+    }
+  });
+}
+
+window.addEventListener('load', init);

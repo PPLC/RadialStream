@@ -1,20 +1,35 @@
 // import client side soundworks and player experience
 import * as soundworks from 'soundworks/client';
-import PlayerExperience from './PlayerExperience.js';
-import viewTemplates from '../shared/viewTemplates';
-import viewContent from '../shared/viewContent';
+import PlayerExperience from './PlayerExperience';
+import serviceViews from '../shared/serviceViews';
 
-window.addEventListener('load', () => {
-  const { appName, clientType, socketIO }  = window.soundworksConfig;
+function bootstrap() {
+  // remove initial loader
+  document.body.classList.remove('loading');
 
-  soundworks.client.init(clientType, { appName, socketIO });
-  soundworks.client.setViewContentDefinitions(viewContent);
-  soundworks.client.setViewTemplateDefinitions(viewTemplates);
+  // initialize the client with configuration received
+  // from the server through the `index.html`
+  // @see {~/src/server/index.js}
+  // @see {~/html/default.ejs}
+  const config = Object.assign({ appContainer: '#container' }, window.soundworksConfig);
+  soundworks.client.init(config.clientType, config);
 
-  const experience = new PlayerExperience();
+  // configure views for the services
+  soundworks.client.setServiceInstanciationHook((id, instance) => {
+    if (serviceViews.has(id))
+      instance.view = serviceViews.get(id, config);
+  });
 
+  // create client side (player) experience and start the client
+  const experience = new PlayerExperience(config.assetsDomain);
   soundworks.client.start();
 
-  document.addEventListener('touchstart', (e) => e.preventDefault());
-  document.addEventListener('touchmove', (e) => e.preventDefault());
-});
+  // reload client if server is down...
+  soundworks.client.socket.addStateListener(eventName => {
+    if (eventName === 'disconnect') {
+      setTimeout(() => window.location.reload(true), 2000);
+    }
+  });
+}
+
+window.addEventListener('load', bootstrap);

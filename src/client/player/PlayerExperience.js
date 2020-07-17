@@ -1,127 +1,20 @@
 import * as soundworks from 'soundworks/client';
 import PlacerView from './PlacerView';
 import userTiming from './user-timing';
-import Vex from 'vexflow';
-
-import DeferService from '../shared/DeferService';
+import PlayerView from './PlayerView.js';
 
 const audioContext = soundworks.audioContext;
 const client = soundworks.client;
 
-const viewTemplate = `
-  <div class="fit-container background"></div>
-  <div class="fit-container wrapper <%= state %>">
-    <% if (state === 'wait' || state === 'running') { %>
-      <% if (state === 'wait') { %>
-        <p class="message wait">Please wait</p>
-      <% } %>
-      <div id="intensity">
-        <p class="forte">fff</p>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-          <line x1="0" y1="0" x2="50" y2="100" />
-          <line x1="50" y1="100" x2="100" y2="0" />
-        </svg>
-        <p class="piano">ppp</p>
-      </div>
-      <canvas id="note"></canvas>
-    <% } else { %>
-      <p class="message">Thanks!</p>
-    <% } %>
-  </div>
-`;
+const model = { title: 'radial-stream', state: 'wait' };
 
-class PlayerView extends soundworks.View {
-  onRender() {
-    super.onRender();
-
-    this.$canvas = this.$el.querySelector('#note');
-    this.$background = this.$el.querySelector('.background');
-
-    if (this._label && this.$canvas)
-      this.displayNote();
-  }
-
-  setLabel(label) {
-    this._label = label;
-  }
-
-  noteOn(value) {
-    value = 0.1 + value * 0.9;
-    this.$background.style.opacity = value;
-  }
-
-  noteOff() {
-    this.$background.style.opacity = 0;
-  }
-
-  displayNote() {
-    const label = this._label;
-    const octava = parseInt(label.split('/')[1]);
-    const clef = octava < 4 ? 'bass' : 'treble';
-
-    const w = 100;
-    const h = 260;
-
-    const ctx = this.$canvas.getContext('2d');
-    ctx.canvas.width = w;
-    ctx.canvas.height = h;
-
-    const renderer = new Vex.Flow.Renderer(this.$canvas,
-      Vex.Flow.Renderer.Backends.CANVAS);
-
-    const stave = new Vex.Flow.Stave(0, 80, 100, { fill_style: '#000000' });
-
-    stave.addClef(clef);
-    stave.setContext(ctx).draw();
-
-    const note = new Vex.Flow.StaveNote({
-      keys: [label],
-      duration: "1",
-      clef: clef,
-    });
-
-    if (/#/.test(label))
-      note.addAccidental(0, new Vex.Flow.Accidental('#'))
-
-    Vex.Flow.Formatter.FormatAndDraw(ctx, stave, [note]);
-
-
-    // invert colors and shift image in y axis
-    const imageData = ctx.getImageData(0, 0, 100, 260);
-    const data = imageData.data;
-    let lastDrawnPixelIndex = null;
-
-    for (let i = 0; i < data.length; i += 4) {
-      // if the pixel is not transparent
-      if (data[i+3] !== 0)
-        lastDrawnPixelIndex = i;
-
-      data[i] = 255 - data[i];
-      data[i+1] = 255 - data[i+1];
-      data[i+2] = 255 - data[i+2];
-    }
-
-    // define line of the last pixel (4 values per pixels * 100 pixels per lines)
-    const line = Math.ceil(lastDrawnPixelIndex / (4 * w));
-    const yShift = h - line;
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.putImageData(imageData, 0, yShift);
-  }
-}
-
-// this experience plays a sound when it starts, and plays another sound when
-// other clients join the experience
-export default class PlayerExperience extends soundworks.Experience {
-  constructor() {
+class PlayerExperience extends soundworks.Experience {
+  constructor(assetsDomain) {
     super();
 
-    this.platform = this.require('platform', { /*features: ['wake-lock']*/ });
+    this.platform = this.require('platform', { features: ['web-audio'] });
     this.placer = this.require('placer', { view: new PlacerView() });
     this.params = this.require('shared-params');
-
-    // this.defer = this.require('defer', { service: 'placer' });
-    // setTimeout(() => { this.defer.ready(); }, 10000);
 
     this.noteIsOn = false;
     this.lastNoteOnTime = -999999;
@@ -129,19 +22,18 @@ export default class PlayerExperience extends soundworks.Experience {
 
     this._handleTouchStart = this._handleTouchStart.bind(this);
     this._handleTouchEnd = this._handleTouchEnd.bind(this);
+
+    this.checkin = this.require('checkin', { showDialog: false });
+    this.state = 
+    this.sharedParams = this.require('shared-params');
+    this.audioBufferManager = this.require('audio-buffer-manager', {
+      assetsDomain: assetsDomain,
+      files: [ /* ... */ ],
+    });
   }
 
-  init() {
-    // initialize the view
-    this.viewTemplate = viewTemplate;
-    this.viewContent = { state: 'wait' };
-    this.viewCtor = PlayerView;
-    this.viewOptions = { preservePixelRatio: true };
-    this.view = this.createView();
-  }
-
-  set state(state) {
-    this.viewContent.state = state;
+  setState(state) {
+    this.view.state = state;
     this.view.render();
 
     if (state === 'running') {
@@ -177,16 +69,16 @@ export default class PlayerExperience extends soundworks.Experience {
     }
   }
 
-  start() {
-    super.start(); // don't forget this
+  async start() {
+    super.start();
 
-    if (!this.hasStarted)
-      this.init();
-
-    this.show();
-
-    this.view.setLabel(client.label);
+    this.view = new PlayerView({ state: 'wait' }, {id: 'player' });
     this.surface = new soundworks.TouchSurface(this.view.$el);
-    this.params.addParamListener('state', (state) => this.state = state);
+    this.view.setLabel(client.label);
+    this.sharedParams.addParamListener('state', (state) => { this.setState(state); });
+
+    await this.show();
   }
 }
+
+export default PlayerExperience;

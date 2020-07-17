@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
 
     <title>
       <%= data.appName %>
@@ -14,7 +15,7 @@
     <link rel="stylesheet" href="<%= data.assetsDomain %>css/main.css?<%= data.version %>">
   </head>
 
-  <body>
+  <body class="loading">
     <div id="container" class="container"></div>
 
     <script>
@@ -23,9 +24,9 @@
     </script>
 
     <% if (data.env === 'production') { %>
-    <script src="<%= data.assetsDomain %>js/<%= data.clientType %>.min.js?<%= data.version %>"></script>
+    <script src="<%= data.assetsDomain %>js/<%= data.clientType %>.min.js"></script>
     <% } else { %>
-    <script src="<%= data.assetsDomain %>js/<%= data.clientType %>.js?<%= data.version %>"></script>
+    <script src="<%= data.assetsDomain %>js/<%= data.clientType %>.js"></script>
     <% } %>
 
     <% if (data.env === 'production' && data.gaId) { %>

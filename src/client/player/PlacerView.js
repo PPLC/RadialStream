@@ -57,7 +57,7 @@ const defaultViewContent = {
   rejected: false,
 };
 
-export default class KeyboardView extends SegmentedView {
+class KeyboardView extends SegmentedView {
   constructor(template = tmpl, content = defaultViewContent, event, options) {
     super(template, content, event, { id: 'keyboard' });
 
@@ -300,3 +300,5 @@ export default class KeyboardView extends SegmentedView {
   }
 
 }
+
+export default KeyboardView;

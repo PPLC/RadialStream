@@ -23,14 +23,14 @@
  * Import and overrides `wavesjs/basic-controllers` sass files,
  * rendering of the controls can be configured though variables here.
  */
-@import '04-basic-shared-controller';
+ @import '04-basic-shared-controller';
 
-/**
- * Default styles for the `survey` scene.
- */
-@import '05-survey';
-
+ /**
+  * Default styles for the `survey` scene.
+  */
+ @import '05-survey';
+ 
 /**
  * Entry point for application specific styling and overriding.
  */
-@import 'overrides';
+@import '_application';

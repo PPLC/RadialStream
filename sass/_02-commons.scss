@@ -47,6 +47,10 @@ p {
   padding: 0;
 }
 
+.loading {
+  background: url(../images/loader.gif) 50% 50% no-repeat;
+}
+
 // -----------------------------------------------------------------
 // LAYOUT HELPERS
 // -----------------------------------------------------------------
@@ -132,7 +136,7 @@ p, .normal {
 
 .btn {
   background-color: $backgroundColor;
-  border: 1px solid $textColor;
+  border: $borderSize solid $textColor;
   border-radius: $borderRadius;
   color: $textColor;
   padding: 6px 0;
@@ -141,8 +145,9 @@ p, .normal {
   @include transition(background-color 50ms);
   letter-spacing: 0.05em;
 
-  &:active {
+  &:active, &.active {
     background-color: $textColor;
+    color: $backgroundColor;
   }
 
   &:focus {
@@ -155,6 +160,16 @@ p, .normal {
 
   &.selected {
     opacity: 1;
+  }
+
+  &.pushed {
+    background-color: $textColor;
+    color: $backgroundColor;
+  }
+
+  &.released {
+    background-color: $backgroundColor;
+    color: $textColor;
   }
 }
 
@@ -174,5 +189,8 @@ p, .normal {
 
 .soft-blink {
   @include animation('soft-blink 3.6s ease-in-out infinite');
+<<<<<<< HEAD
 }
-
+=======
+}
+>>>>>>> temp_fix_install

@@ -2,18 +2,19 @@ import 'source-map-support/register'; // enable sourcemaps in node
 import * as soundworks from 'soundworks/server';
 import * as jazz from 'jazz-midi';
 import PlayerExperience from './PlayerExperience';
-import defaultConfig from './config/default';
-import prodConfig from './config/prod';
+import path from 'path';
+import ControllerExperience from './ControllerExperience';
 
+const configName = process.env.ENV || 'default';
+const configPath = path.join(__dirname, 'config', configName);
 let config = null;
 
-switch(process.env.ENV) {
-  case 'PROD':
-    config = prodConfig;
-    break;
-  default:
-    config = defaultConfig;
-    break;
+// rely on node `require` as the path is dynamic
+try {
+  config = require(configPath).default;
+} catch(err) {
+  console.error(`Invalid ENV "${configName}", file "${configPath}.js" not found`);
+  process.exit(1);
 }
 
 // define labels
@@ -58,13 +59,18 @@ config.setup.coordinates = midiNotes;
 // configure express environment ('production' enables cache systems)
 process.env.NODE_ENV = config.env;
 
+if (process.env.PORT) {
+  config.port = process.env.PORT;
+}
+
+
 soundworks.server.init(config);
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
     clientType: clientType,
     env: config.env,
     appName: config.appName,
-    socketIO: config.socketIO,
+    websockets: config.websockets,
     version: config.version,
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
@@ -108,25 +114,13 @@ if (midiOutList.length > 0) {
   console.log('No MIDI output ports available');
 }
 
-/********************************************************
- *
- *  setup shared parameters, controller, and player
- *
- */
-class Controller extends soundworks.BasicSharedController {
-  constructor() {
-    super('controller');
-    this.auth = this.require('auth');
-  }
-}
-
 const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['controller']);
 sharedParams.addEnum('state', 'state', ['wait', 'running', 'end'], 'wait');
 sharedParams.addTrigger('panic', 'all notes off');
 
-const controller = new Controller();
-const experience = new PlayerExperience(midiNotes, midi);
+const controller = new ControllerExperience('controller', { auth: true });
+const experience = new PlayerExperience('player', midiNotes, midi);
 
 // start application
 soundworks.server.start();

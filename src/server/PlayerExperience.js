@@ -2,17 +2,19 @@ import { Experience } from 'soundworks/server';
 import scoreRecorder from './scoreRecorder';
 
 // server-side 'player' experience.
-export default class PlayerExperience extends Experience {
-  constructor(midiNotes, midi) {
-    super('player');
+class PlayerExperience extends Experience {
+  constructor(clientType, midiNotes, midi) {
+    super(clientType);
 
     this.midiNotes = midiNotes;
     this.noteIsOn = [];
     this.midi = midi;
 
-    this.params = this.require('shared-params');
+    this.checkin = this.require('checkin');
     this.config = this.require('shared-config');
     this.placer = this.require('placer');
+    this.sharedParams = this.require('shared-params');
+    this.audioBufferManager = this.require('audio-buffer-manager');
 
     this.onPanic = this.onPanic.bind(this);
     this.onStateChange = this.onStateChange.bind(this);
@@ -20,9 +22,9 @@ export default class PlayerExperience extends Experience {
 
   // if anything needs to append when the experience starts
   start() {
-    this.params.addParamListener('panic', this.onPanic);
-    this.params.addParamListener('state', this.onStateChange);
-
+    this.sharedParams.addParamListener('panic', this.onPanic);
+    this.sharedParams.addParamListener('state', this.onStateChange);
+    console.log(this.config.get('scoreRecordDirectory'));
     scoreRecorder.init(this.config.get('scoreRecordDirectory'));
   }
 
@@ -46,7 +48,7 @@ export default class PlayerExperience extends Experience {
       this.noteIsOn[index] = false;
     });
 
-    this.params.update('numPlayers', this.clients.length);
+    this.sharedParams.update('numPlayers', this.clients.length);
   }
 
   exit(client) {
@@ -56,7 +58,7 @@ export default class PlayerExperience extends Experience {
     const pitch = this.midiNotes[index];
 
     this.noteOff(pitch);
-    this.params.update('numPlayers', this.clients.length);
+    this.sharedParams.update('numPlayers', this.clients.length);
   }
 
   noteOn(pitch, velocity) {
@@ -77,7 +79,7 @@ export default class PlayerExperience extends Experience {
     //console.log("note off:", pitch);
     scoreRecorder.record('note-off', pitch);
   }
-
+  
   onStateChange(state) {
     if (state === 'running')
       scoreRecorder.start();
@@ -87,3 +89,5 @@ export default class PlayerExperience extends Experience {
     this.midiNotes.forEach((pitch) => this.noteOff(pitch));
   }
 }
+
+export default PlayerExperience;
