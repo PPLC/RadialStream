@@ -142,7 +142,6 @@ p, .normal {
   padding: 6px 0;
   font-size: 1rem;
   display: block;
-  @include transition(background-color 50ms);
   letter-spacing: 0.05em;
 
   &:active, &.active {
@@ -154,12 +153,8 @@ p, .normal {
     outline: none;
   }
 
-  &.unselected, &.disabled, &[disabled] {
+  &.disabled, &[disabled] {
     opacity: 0.5;
-  }
-
-  &.selected {
-    opacity: 1;
   }
 
   &.pushed {
@@ -189,8 +184,4 @@ p, .normal {
 
 .soft-blink {
   @include animation('soft-blink 3.6s ease-in-out infinite');
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> temp_fix_install

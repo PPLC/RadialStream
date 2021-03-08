@@ -1,4 +1,4 @@
-import { View } from 'soundworks/client';
+import { View } from "soundworks/client";
 
 const template = `
   <% logs.forEach(function(log) { %>
@@ -24,6 +24,13 @@ class LogComponent {
 
   exit() {
     this.view.remove();
+  }
+
+  error_msg(msg) {
+    const logView = `${msg}`;
+    this.stack.unshift(logView);
+
+    this.view.render();
   }
 
   error(file, line, col, msg, userAgent) {

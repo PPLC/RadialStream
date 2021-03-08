@@ -1,6 +1,6 @@
 import path from 'path';
-const cwd = process.cwd();
 
+const cwd = process.cwd();
 
 // Configuration of the application.
 // Other entries can be added (as long as their name doesn't conflict with
@@ -12,24 +12,57 @@ export default {
   // the `platform` service to populate its view
   appName: 'radial-stream',
 
-  // name of the environnement ('production' enable cache in express application)
+  // name of the environment ('production' enable cache in express application)
   env: 'development',
-
-  // version of application, can be used to force reload css and js files
-  // from server (cf. `html/default.ejs`)
-  version: '0.0.1',
 
   // name of the default client type, i.e. the client that can access the
   // application at its root URL
-  defaultClient: 'player',
+  defaultClient: 'attendee',
 
   // define from where the assets (static files) should be loaded, these value
   // could also refer to a separate server for scalability reasons. This value
-  // should also be used client-side to configure the `loader` service.
+  // should also be used client-side to configure the `audio-buffer-manager` service.
   assetsDomain: '/',
 
   // port used to open the http server, in production this value is typically 80
   port: 8000,
+
+  // define if the server should use gzip compression for static files
+  enableGZipCompression: true,
+
+  // location of the public directory (accessible through http(s) requests)
+  publicDirectory: path.join(cwd, 'public'),
+
+  // directory where the server templating system looks for the `ejs` templates
+  templateDirectory: path.join(cwd, 'html'),
+
+  // define if the HTTP server should be launched using secure connections.
+  // For development purposes when set to `true` and no certificates are given
+  // (cf. `httpsInfos`), a self-signed certificate is created.
+  useHttps: false,
+
+  // paths to the key and certificate to be used in order to launch the https
+  // server. Both entries are required otherwise a self-signed certificate
+  // is generated.
+  httpsInfos: {
+    key: null,
+    cert: null,
+  },
+
+  // socket.io configuration
+  websockets: {
+    url: '',
+    transports: ['websocket'],
+    path: '',
+    // @note: EngineIO defaults
+    // pingTimeout: 3000,
+    // pingInterval: 1000,
+    // upgradeTimeout: 10000,
+    // maxHttpBufferSize: 10E7,
+  },
+
+  // password to be used by the `auth` service
+  password: 'radial',
 
   // describe the location where the experience takes places, theses values are
   // used by the `placer`, `checkin` and `locator` services.
@@ -52,41 +85,11 @@ export default {
     capacity: Infinity,
   },
 
-  // path to the score recording
-  scoreRecordDirectory: path.join(cwd, 'logs', 'score'),
-
-  // socket.io configuration
-  socketIO: {
-    url: '',
-    transports: ['websocket'],
-    // @note: EngineIO defaults
-    // pingTimeout: 3000,
-    // pingInterval: 1000,
-    // upgradeTimeout: 10000,
-    // maxHttpBufferSize: 10E7,
-  },
-
-  // define if the HTTP server should be launched using secure connections.
-  // For development purposes when set to `true` and no certificates are given
-  // (cf. `httpsInfos`), a self-signed certificate is created.
-  useHttps: false,
-
-  // paths to the key and certificate to be used in order to launch the https
-  // server. Both entries are required otherwise a self-signed certificate
-  // is generated.
-  httpsInfos: {
-    key: null,
-    cert: null,
-  },
-
-  // password to be used by the `auth` service
-  password: 'fluxus88',
-
   // configuration of the `osc` service
   osc: {
     // IP of the currently running node server
     receiveAddress: '127.0.0.1',
-    // port listening for incomming messages
+    // port listening for incoming messages
     receivePort: 57121,
     // IP of the remote application
     sendAddress: '127.0.0.1',
@@ -94,14 +97,11 @@ export default {
     sendPort: 57120,
   },
 
-  // define if the server should use gzip compression for static files
-  enableGZipCompression: true,
-
-  // location of the public directory (accessible through http(s) requests)
-  publicDirectory: path.join(cwd, 'public'),
-
-  // directory where the server templating system looks for the `ejs` templates
-  templateDirectory: path.join(cwd, 'html'),
+  // configuration of the `raw-socket` service
+  rawSocket: {
+    // port used for socket connection
+    port: 8080
+  },
 
   // bunyan configuration
   logger: {

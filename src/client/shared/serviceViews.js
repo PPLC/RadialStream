@@ -23,7 +23,8 @@ import {
  */
 // ------------------------------------
 
-const noop = () => {};
+const noop = () => {
+};
 
 const serviceViews = {
   // ------------------------------------------------
@@ -417,7 +418,8 @@ const serviceViews = {
       });
     }
 
-    setArea(area) { /* no need for area */ }
+    setArea(area) { /* no need for area */
+    }
 
     onRender() {
       super.onRender();
@@ -610,12 +612,18 @@ const serviceViews = {
           </div>
           <div class="section-bottom"></div>
         <% } else { %>
-          <div class="section-top flex-middle"></div>
-          <div class="section-center flex-center">
-              <p class="big">
-                <b><%= globals.appName %></b>
-              </p>
+          <div class="section-top flex-middle">
+            <p class="big" style="width: 100%; text-align:center;">
+            <b>Map&Fold Festival</b>
+            </p>
           </div>
+
+          <div class="section-center flex-center" style="background-image: url('images/mf_icons.png');background-repeat:no-repeat; background-position: center center;">
+          <p class="small">
+          Welcome to our streaming site. During the event you will have the ability to interact with the performances, applaud and have a virtual break with the attendees.
+          </p>
+          </div>
+
           <div class="section-bottom flex-middle">
             <% if (checking === true) { %>
             <p class="small soft-blink"><%= checkingMessage %></p>
@@ -623,6 +631,7 @@ const serviceViews = {
             <p class="small soft-blink"><%= instructions %></p>
             <% } %>
           </div>
+
         <% } %>
       `;
 
@@ -630,7 +639,7 @@ const serviceViews = {
         isCompatible: null,
         hasAuthorizations: null,
         checking: false,
-        instructions: 'Touch the screen to join!',
+        instructions: 'Touch to join!',
         checkingMessage: 'Please wait while checking compatiblity',
         errorCompatibleMessage: 'Sorry,<br />Your device is not compatible with the application.',
         errorHooksMessage: `Sorry,<br />The application didn't obtain the necessary authorizations.`,
@@ -714,7 +723,6 @@ const serviceViews = {
       };
     }
   },
-
 
   // public API
   has(id) {

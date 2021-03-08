@@ -4,6 +4,7 @@ import { View } from 'soundworks/client';
 controllers.setTheme('dark');
 
 /* --------------------------------------------------------- */
+
 /* GUIs
 /* --------------------------------------------------------- */
 
@@ -19,7 +20,9 @@ class _BooleanGui {
       callback: (value) => {
         if (guiOptions.confirm) {
           const msg = `Are you sure you want to propagate "${param.name}:${value}"`;
-          if (!window.confirm(msg)) { return; }
+          if (!window.confirm(msg)) {
+            return;
+          }
         }
 
         param.update(value);
@@ -48,7 +51,9 @@ class _EnumGui {
       callback: (value) => {
         if (guiOptions.confirm) {
           const msg = `Are you sure you want to propagate "${param.name}:${value}"`;
-          if (!window.confirm(msg)) { return; }
+          if (!window.confirm(msg)) {
+            return;
+          }
         }
 
         param.update(value);
@@ -91,7 +96,9 @@ class _NumberGui {
     this.controller.addListener((value) => {
       if (guiOptions.confirm) {
         const msg = `Are you sure you want to propagate "${param.name}:${value}"`;
-        if (!window.confirm(msg)) { return; }
+        if (!window.confirm(msg)) {
+          return;
+        }
       }
 
       param.update(value);
@@ -119,7 +126,9 @@ class _TextGui {
       this.controller.addListener((value) => {
         if (guiOptions.confirm) {
           const msg = `Are you sure you want to propagate "${param.name}"`;
-          if (!window.confirm(msg)) { return; }
+          if (!window.confirm(msg)) {
+            return;
+          }
         }
 
         param.update(value);
@@ -143,7 +152,9 @@ class _TriggerGui {
       callback: () => {
         if (guiOptions.confirm) {
           const msg = `Are you sure you want to propagate "${param.name}"`;
-          if (!window.confirm(msg)) { return; }
+          if (!window.confirm(msg)) {
+            return;
+          }
         }
 
         param.update();
@@ -151,9 +162,9 @@ class _TriggerGui {
     });
   }
 
-  set(val) { /* nothing to set here */ }
+  set(val) { /* nothing to set here */
+  }
 }
-
 
 class SharedParamsComponent {
   constructor(selector, experience) {
@@ -172,6 +183,7 @@ class SharedParamsComponent {
     this.view.appendTo($container);
 
     for (let name in this.sharedParams.params) {
+      if (name === "numPlayers") continue; // Show this in Stats, not here
       const param = this.sharedParams.params[name];
       const gui = this._createGui(param);
 
